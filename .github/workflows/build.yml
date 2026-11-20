@@ -1,0 +1,30 @@
+name: Build EXE
+
+on:
+  workflow_dispatch:          # Actions 탭에서 "Run workflow" 버튼으로 실행
+  push:
+    paths:
+      - "key_overlay.py"      # key_overlay.py 를 수정하면 자동으로 다시 빌드
+      - ".github/workflows/build.yml"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install packages
+        run: pip install pynput pyinstaller
+
+      - name: Build exe
+        run: pyinstaller --noconfirm --onefile --noconsole --name KeyOverlay key_overlay.py
+
+      - name: Upload exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: KeyOverlay
+          path: dist/KeyOverlay.exe
